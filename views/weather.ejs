@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Weather App</title>
+</head>
+<body>
+  <h1>Weather in <%= city %></h1>
+  <% if (weatherData && weatherData.main && weatherData.main.temp) { %>
+    <p>Temperature: <%= weatherData.main.temp %>°C</p>
+    <p>Description: <%= weatherData.weather[0].description %></p>
+    <p>Humidity: <%= weatherData.main.humidity %>%</p>
+  <% } else { %>
+    <p>No weather data available</p>
+  <% } %>
+</body>
+</html>
