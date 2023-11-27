@@ -1,39 +1,41 @@
-name: Publish 🚀
+name: Node.js Azure CI/CD
 
 on:
-  workflow_dispatch:
   push:
     branches:
-    - main
-
-env:
-  AZURE_WEBAPP_NAME: current-time-service
-  AZURE_WEBAPP_PACKAGE_PATH: "./publish"
+      - main
 
 jobs:
-  publish:
+  build:
     runs-on: ubuntu-latest
-    
+
     steps:
-      - uses: actions/checkout@v3
-      
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '6.0.x'
-          
-      - name: Restore
-        run: dotnet restore ./CurrentTimeService.sln
-        
-      - name: Build
-        run: dotnet build ./CurrentTimeService.sln --configuration Release --no-restore
-        
-      - name: Publish
-        run: dotnet publish ./CurrentTimeService.sln --configuration Release --no-build --output '${{ env.AZURE_WEBAPP_PACKAGE_PATH }}'
-        
-      - name: Deployment
-        uses: azure/webapps-deploy@v2
-        with:
-          app-name: ${{ env.AZURE_WEBAPP_NAME }}
-          publish-profile: ${{ secrets.AZURE_PUBLISH_PROFILE }}
-          package: "${{ env.AZURE_WEBAPP_PACKAGE_PATH }}"
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Setup Node.js
+      uses: actions/setup-node@v3
+      with:
+        node-version: '14'
+
+    - name: Install dependencies
+      run: npm install
+
+    - name: Build and test
+      run: npm run build
+
+  deploy:
+    runs-on: ubuntu-latest
+
+    needs: build
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+
+    - name: Deploy to Azure Web App
+      uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'Weather app'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        package: .
